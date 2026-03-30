@@ -17,6 +17,9 @@ from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
 
+import streamlit as st
+import joblib
+
  #clean the dataset       
 data = pd.read_csv("loan_data.csv")
 print("First Five Rows: ",data.head())
@@ -126,27 +129,27 @@ print("Classification Report:\n",classification_report(y_test, y_pred_m1))
 # print("------------------------------------------------------------------------------------------------------------")
 # print("Using DecisionTreeClassifier")
 
-# # Training the Model
+# # # Training the Model
 # model2 = DecisionTreeClassifier()
 # model2.fit(X_train, y_train)
 
 # print(model2)
 # print("Model trained successfully")
 
-# # Prediction
+#  Prediction
 # y_pred_m2 = model2.predict(X_test)
 # print(y_pred_m2)
 
-# # Accuracy
+# Accuracy
 # print("Accuracy: ", accuracy_score(y_test, y_pred_m2))
 
 # # confusion matrix
 # print("Confusion Matrix:\n",confusion_matrix(y_test, y_pred_m2))
 
-# # # classification report
+# # classification report
 # print("Classification Report:\n",classification_report(y_test, y_pred_m2))
 
-
+print("--------------------------------------------------------------------------------------------")
 # Final Model means improving the performance, accuracy
 
 # Tune Model
@@ -193,7 +196,36 @@ print(features)
 # Removes less useful features
 
 important_features = X_train.columns[importance > 0.02]
-print(important_features)
+# print(important_features)
 
 X_train = X_train[important_features]
 X_test = X_test[important_features]
+
+# Retrain the model 
+
+modelRandom = RandomForestClassifier()
+modelRandom.fit(X_train, y_train)
+
+# Predictions
+
+y_predNew = modelRandom.predict(X_test)
+
+# Accuracy
+print("Accuracy: ", accuracy_score(y_test, y_predNew))
+
+# confusion matrix
+print("Confusion Matrix:\n",confusion_matrix(y_test, y_predNew))
+
+# classification report
+print("Classification Report:\n",classification_report(y_test, y_predNew))
+
+
+
+
+
+# Load model
+model = joblib.load("loan_data.csv")
+
+st.title("Loan Approval Prediction")
+
+st.write("Enter details to predict loan approval")
