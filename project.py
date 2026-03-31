@@ -154,34 +154,32 @@ print("-------------------------------------------------------------------------
 
 # Tune Model
 
-# from sklearn.model_selection import GridSearchCV                  # GridSearchCV -> tool to find best parameter
+from sklearn.model_selection import GridSearchCV                  # GridSearchCV -> tool to find best parameter
 
-# param_grid = {
-#     'n_estimators': [100, 200, 300],
-#     'max_depth': [None, 10, 20],
-#     'min_samples_split': [2, 5],
-#     'min_samples_leaf': [1, 2]
-# }
+param_grid = {
+    'n_estimators': [100, 200, 300],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5],
+    'min_samples_leaf': [1, 2]
+}
 
-# grid = GridSearchCV(RandomForestClassifier(), param_grid, cv=5)     # Split the data into 5 parts in which 4 for training and 1 for testing
+grid = GridSearchCV(RandomForestClassifier(), param_grid, cv=5)     # Split the data into 5 parts in which 4 for training and 1 for testing
 
-# from sklearn.model_selection import GridSearchCV
+param_grid = {
+    'n_estimators': [100, 200, 300],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5],
+    'min_samples_leaf': [1, 2]
+}
 
-# param_grid = {
-#     'n_estimators': [100, 200, 300],
-#     'max_depth': [None, 10, 20],
-#     'min_samples_split': [2, 5],
-#     'min_samples_leaf': [1, 2]
-# }
+grid = GridSearchCV(RandomForestClassifier(), param_grid, cv=5, verbose=2,n_jobs=-1)
+grid.fit(X_train, y_train)
 
-# grid = GridSearchCV(RandomForestClassifier(), param_grid, cv=5, verbose=2,n_jobs=-1)
-# grid.fit(X_train, y_train)
+print("Training started...")
+grid.fit(X_train, y_train)
+print("Training finished!")
 
-# print("Training started...")
-# grid.fit(X_train, y_train)
-# print("Training finished!")
-
-# print("best parameters:\n",grid.best_params_)
+print("best parameters:\n",grid.best_params_)
 
 
 # Feature Selection   ->   reduces noise
@@ -196,8 +194,8 @@ print(features)
 # Removes less useful features
 
 important_features = X_train.columns[importance > 0.02]
-# print(important_features)
 
+print(important_features)
 X_train = X_train[important_features]
 X_test = X_test[important_features]
 
@@ -219,13 +217,34 @@ print("Confusion Matrix:\n",confusion_matrix(y_test, y_predNew))
 # classification report
 print("Classification Report:\n",classification_report(y_test, y_predNew))
 
-
-
-
-
-# Load model
-model = joblib.load("loan_data.csv")
+# after training your model
+joblib.dump(modelRandom, "loan_model.pkl")
 
 st.title("Loan Approval Prediction")
-
 st.write("Enter details to predict loan approval")
+
+age = st.number_input("Age")
+income = st.number_input("Income")
+loan_amount = st.number_input("Loan Amount")
+credit_score = st.number_input("Credit Score")
+emp_exp = st.number_input("Employee Experience")
+home_ownership = st.number_input("Home Ownership")
+loan_intent = st.number_input("Loan Intent")
+loan_int_rate = st.number_input("Loan Interest Rate")
+loan_percent_income = st.number_input("Loan Percent Income")
+credit_hist_length = st.number_input("Credit History Length")
+previous_loan_defaults_on_file = st.number_input("Previous Loan Defaults on File")
+
+
+if st.button("Predict"):
+    input_data = np.array([[age, income, loan_amount, credit_score, emp_exp,
+       home_ownership, loan_intent,loan_int_rate,
+       loan_percent_income, credit_hist_length,
+       previous_loan_defaults_on_file]])
+    
+    prediction = modelRandom.predict(input_data)
+    
+    if prediction[0] == 1:
+        st.success("Loan Approved ✅")
+    else:
+        st.error("Loan Rejected ❌")
